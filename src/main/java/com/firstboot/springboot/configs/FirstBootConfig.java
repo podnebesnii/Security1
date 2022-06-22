@@ -43,33 +43,36 @@ public class FirstBootConfig implements ApplicationListener<ContextRefreshedEven
 
         Iterable<User> users = userRepository.findAll();
         alreadySetup = users.iterator().hasNext();
+        if (alreadySetup) {
+            return;
+        } else {
+            Role adminRole = new Role(ROLE_ADMIN, "ROLE_ADMIN");
+            Role userRole = new Role(ROLE_USER, "ROLE_USER");
+            Set<Role> adminRoles = new HashSet<>();
+            adminRoles.add(adminRole);
+            adminRoles.add(userRole);
+            Set<Role> userRoles = new HashSet<>();
+            userRoles.add(userRole);
+            roleRepository.save(adminRole);
+            roleRepository.save(userRole);
 
-        Role adminRole = new Role(ROLE_ADMIN, "ROLE_ADMIN");
-        Role userRole = new Role(ROLE_USER, "ROLE_USER");
-        Set<Role> adminRoles = new HashSet<>();
-        adminRoles.add(adminRole);
-        adminRoles.add(userRole);
-        Set<Role> userRoles = new HashSet<>();
-        userRoles.add(userRole);
-        roleRepository.save(adminRole);
-        roleRepository.save(userRole);
+            User admin = new User();
+            admin.setName("admin");
+            admin.setLastname("Admin");
+            admin.setEmail("admin");
+            admin.setPassword(passwordEncoder.encode("admin"));
+            admin.setRoles(adminRoles);
+            userRepository.save(admin);
 
-        User admin = new User();
-        admin.setName("admin");
-        admin.setLastname("Admin");
-        admin.setEmail("admin");
-        admin.setPassword(passwordEncoder.encode("admin"));
-        admin.setRoles(adminRoles);
-        userRepository.save(admin);
-
-        User user = new User();
-        user.setName("user");
-        user.setLastname("User");
-        user.setEmail("user");
-        user.setPassword(passwordEncoder.encode("user"));
-        user.setRoles(userRoles);
-        userRepository.save(user);
-        alreadySetup = true;
+            User user = new User();
+            user.setName("user");
+            user.setLastname("User");
+            user.setEmail("user");
+            user.setPassword(passwordEncoder.encode("user"));
+            user.setRoles(userRoles);
+            userRepository.save(user);
+            alreadySetup = true;
+        }
     }
 
 }
